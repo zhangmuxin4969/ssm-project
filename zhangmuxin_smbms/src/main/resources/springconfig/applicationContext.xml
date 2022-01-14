@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd
+">
+
+    <!--开启包扫描-->
+    <context:component-scan base-package="zhangmuxin.service.impl"/>
+    <!--整合数据源-->
+    <context:property-placeholder location="classpath:dbconfig/db.properties"/>
+    <!--配置数据源-->
+    <bean id="drudDs" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${db.driverClassName}"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+        <property name="initialSize" value="${db.initialSize}"/>
+        <property name="maxWait" value="${db.maxWait}"/>
+    </bean>
+    <!-- 配置mybatis-plus的sqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean">
+        <property name="dataSource" ref="drudDs" />
+        <property name="configLocation" value="classpath:mybaitsconfig/MyBatisConfig.xml"/>
+        <!-- 其他属性 略 -->
+        <property name="plugins">
+            <array>
+                <ref bean="mybatisPlusInterceptor"/>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="configuration" class="com.baomidou.mybatisplus.core.MybatisConfiguration">
+        <!-- 需配置该值为false,避免1或2级缓存可能出现问题,该属性会在旧插件移除后一同移除 -->
+        <property name="useDeprecatedExecutor" value="false"/>
+    </bean>
+
+    <bean id="mybatisPlusInterceptor" class="com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor">
+        <property name="interceptors">
+            <list>
+                <ref bean="paginationInnerInterceptor"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="paginationInnerInterceptor" class="com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor">
+        <!-- 对于单一数据库类型来说,都建议配置该值,避免每次分页都去抓取数据库类型 -->
+        <constructor-arg name="dbType" value="H2"/>
+    </bean>
+
+    <!--配置mapper 扫描器 扫描接口  生成代理对象 把对象放入到Spring 容器-->
+    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--里面可以配置工厂对象  自动找容器中是否有 SqlSessionFactoryBean 有 自动注入-->
+       <property name="basePackage" value="zhangmuxin.mapper"/>
+    </bean>
+
+<!--    引入其他配置文件  -->
+    <import resource="classpath:txconfig/spring-tx.xml"/>
+
+</beans>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--做全局配置 开启二级缓存-->
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+        <!--配置日志   <setting name="logImpl" value="STDOUT_LOGGING"/>-->
+        <setting name="mapUnderscoreToCamelCase" value="false"/>
+
+
+    </settings>
+
+    <!--配置类型别名  自定义的数据类型-->
+    <typeAliases>
+        <!--mybatis 包扫描  别名默认 就是类名  别名不区分大小写-->
+        <package name="zhangmuxin.pojo"/>
+    </typeAliases>
+
+</configuration>
